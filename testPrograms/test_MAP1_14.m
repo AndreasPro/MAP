@@ -42,25 +42,25 @@ MAPparamsName='Normal';
 
 
 %% #2 probability (fast) or spikes (slow) representation
-% AN_spikesOrProbability='spikes';
+AN_spikesOrProbability='spikes';
 
 % or
 % NB probabilities are not corrected for refractory effects
-AN_spikesOrProbability='probability';
+% AN_spikesOrProbability='probability';
 
 
 %% #3 pure tone, harmonic sequence or speech file input
-signalType= 'tones';
-sampleRate= 50000;
-duration=0.250;                 % seconds
-% toneFrequency= 250:250:8000;    % harmonic sequence (Hz)
-toneFrequency= 1000;            % or a pure tone (Hz8
-rampDuration=.005;              % seconds
+% signalType= 'tones';
+% sampleRate= 50000;
+% duration=0.250;                 % seconds
+% % toneFrequency= 250:250:8000;    % harmonic sequence (Hz)
+% toneFrequency= 1000;            % or a pure tone (Hz8
+% rampDuration=.005;              % seconds
 
 % or
 
-% signalType= 'file';
-% fileName='twister_44kHz';
+signalType= 'file';
+fileName='twister_44kHz';
 
 
 %% #4 rms level

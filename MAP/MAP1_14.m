@@ -912,7 +912,8 @@ while segmentStartPTR<signalLength
 
             for unitNo=1:nCNneurons
                 CNcurrentTemp(unitNo,:)= ...
-                    conv(AN_PSTH(unitNo,:),CNalphaFunction);
+                    conv2(AN_PSTH(unitNo,:),CNalphaFunction);
+            % Changed conv to conv2 because it runs faster. (Andreas)
             end
 %             disp(['sum(AN_PSTH)= ' num2str(sum(AN_PSTH(1,:)))])
             % add post-synaptic current  left over from previous segment
@@ -1017,7 +1018,8 @@ while segmentStartPTR<signalLength
                 [alphaRows alphaCols]=size(ICtrailingAlphas);
                 for ICneuronNo=1:nICcells
                     ICcurrentTemp(ICneuronNo,:)= ...
-                        conv(CN_PSTH(ICneuronNo,:),  IC_CNalphaFunction);
+                        conv2(CN_PSTH(ICneuronNo,:),  IC_CNalphaFunction);
+                % Changed conv to conv2 because it runs faster. (Andreas)
                 end
 
                 % add the unused current from the previous convolution
