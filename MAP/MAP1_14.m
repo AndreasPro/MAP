@@ -18,6 +18,10 @@ function  MAP1_14(inputSignal, sampleRate, BFlist, MAPparamsName, ...
 restorePath=path;
 addpath (['..' filesep 'parameterStore'])
 
+
+CONVOLUTION_CHANGE_TEST = 0; %for debug
+
+
 global OMEParams DRNLParams IHC_cilia_RPParams IHCpreSynapseParams
 global AN_IHCsynapseParams MacGregorParams MacGregorMultiParams
 
@@ -906,15 +910,90 @@ while segmentStartPTR<signalLength
                     synapseNo=synapseNo+1;
                 end
             end
+            
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                        
+            
             % One alpha function per spike
             [alphaRows alphaCols]=size(CNtrailingAlphas);
 
-            for unitNo=1:nCNneurons
-                CNcurrentTemp(unitNo,:)= ...
-                    conv2(AN_PSTH(unitNo,:),CNalphaFunction);
-            % Changed conv to conv2 because it runs faster. (Andreas)
+           for unitNo=1:nCNneurons 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                 CNcurrentTemp0(unitNo,:)= ...
+                      conv(AN_PSTH(unitNo,:),CNalphaFunction);
+              
+
+                 
+                 CNcurrentTemp(unitNo,:)= ...
+                      conv2(AN_PSTH(unitNo,:),CNalphaFunction);
+            % Changed conv to conv2 because it runs faster. (Andreas)   
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% 
+%              
+%                 f = CNalphaFunction;
+%                 g = AN_PSTH(unitNo,:);
+% 
+% 
+%                 g = [g zeros(1,length(f)-1)];
+% 
+%                 spikePos = find(g)';
+% 
+%                 result = zeros(1,length(g));
+% 
+%                 for index = 1:length(spikePos)
+%                     k = spikePos(index);
+%                     result(k:(k+length(f)-1)) = result(k:(k+length(f)-1)) + g(k)*f;
+%                 end
+%              
+%                 CNcurrentTemp2(unitNo,:) = result;    
+
+
             end
+            
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%            
+
+
+         
+            
+            f = CNalphaFunction;
+            g = AN_PSTH;
+
+            g = [g zeros(size(g,1),length(f)-1)];
+
+            [r c] = find(g);
+
+            CNcurrentTemp2 = zeros(size(g));
+
+            for index = 1:length(r)
+
+                row = r(index);
+                col = c(index);
+
+               CNcurrentTemp2(row,col:col+length(f)-1) =  CNcurrentTemp2(row,col:col+length(f)-1) + f*g(row,col);
+
+            end
+
+
+
+CONVOLUTION_CHANGE_TEST =  CONVOLUTION_CHANGE_TEST + sum(abs(CNcurrentTemp2 - CNcurrentTemp))+ sum(abs(CNcurrentTemp0 - CNcurrentTemp));
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
 %             disp(['sum(AN_PSTH)= ' num2str(sum(AN_PSTH(1,:)))])
             % add post-synaptic current  left over from previous segment
             CNcurrentTemp(:,1:alphaCols)=...
@@ -1147,6 +1226,10 @@ while segmentStartPTR<signalLength
 
 
 end  % segment
+
+disp('CONVOLUTION_CHANGE_TEST (if followed by zero all is good)')
+disp(max(CONVOLUTION_CHANGE_TEST)) %% for debugging
+
 
 %% apply refractory correction to spike probabilities
 
